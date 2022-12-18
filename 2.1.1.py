@@ -12,20 +12,52 @@ currency_to_rub = {"AZN": 35.68, "BYR": 23.91, "EUR": 59.90, "GEL": 21.74, "KGS"
 list_print1 = ['Динамика уровня зарплат по годам: ','Динамика количества вакансий по годам: ',
                       'Динамика уровня зарплат по годам для выбранной профессии: ','Динамика количества вакансий по годам для выбранной профессии: ',
                       'Уровень зарплат по городам (в порядке убывания): ','Доля вакансий по городам (в порядке убывания): ']
-class Vacancy:
 
-    def __init__(self, vacancies):
-        self.name = vacancies[name_list[0]]
-        self.salary_average = math.floor((float(vacancies[name_list[1]]) + float(vacancies[name_list[2]])) / 2) \
-                              * currency_to_rub[vacancies[name_list[3]]]
-        self.area_name = vacancies[name_list[4]]
-        self.publication_year = int(vacancies[name_list[5]][:4])
+
+class Vacancy:
+    """Класс для получения данных о вакансии.
+
+    Attributes:
+        name (str): Название вакансии
+        salary_average (int): Средняя зарплата в рублях
+        area_name (str): Название города
+        publication_year (int): Год публикации вакансии
+    """
+    def __init__(self, vacancy):
+        """Инициализирует объект Vacancy, вычисляет среднюю зарплату и переводит в рубли
+
+        Args:
+            vacancy (dict): Вакансия
+        """
+        self.name = vacancy[name_list[0]]
+        self.salary_average = math.floor((float(vacancy[name_list[1]]) + float(vacancy[name_list[2]])) / 2) \
+                              * currency_to_rub[vacancy[name_list[3]]]
+        self.area_name = vacancy[name_list[4]]
+        self.publication_year = int(vacancy[name_list[5]][:4])
+
 
 class DataSet:
+    """Класс для получения и печати статистик.
+
+    Attributes:
+        filename (str): Название файла с данными о вакансиях
+        vacancy_name (str): Название выбранной профессии
+    """
     def __init__(self, filename, vacancy_name):
+        """Инициализирует объект DataSet.
+
+        Args:
+            filename (str): Название файла с данными о вакансиях
+            vacancy_name (str): Название выбранной профессии
+        """
         self.filename, self.vacancy_name = filename, vacancy_name
 
     def csv_reader(self):
+        """Считывает данные из входного файла
+
+        Returns:
+            dict: Все вакансии с информацией о них.
+        """
         with open(self.filename, mode='r', encoding='utf-8-sig') as file:
             reader = csv.reader(file)
             header = next(reader)
@@ -36,6 +68,13 @@ class DataSet:
 
     @staticmethod
     def average(dict):
+        """Высчитывает среднее значение.
+
+        Args:
+            dict (dict): Словарь с значениями
+        Returns:
+            dict: Словарь с обновленными, средними значениями
+        """
         new_dict = {}
         for k, v in dict.items():
             new_dict[k] = int(sum(v) / len(v))
@@ -43,12 +82,24 @@ class DataSet:
 
     @staticmethod
     def increment(dict, k, с):
+        """Дополняет словарь всех средних зарплат за год или в городе
+
+        Args:
+            dict (dict): Словарь со всеми зарплатами за год или в городе по вакансии
+            k (int): Год или город вакансии, по которому идет подсчет
+            с (list): Средняя зарплата у вакансии
+        """
         if k in dict:
             dict[k] += с
         else:
             dict[k] = с
 
     def get_dynamics(self):
+        """Получение всех необходимых статистик для дальнейшей работы
+
+        Returns:
+            dict, dict, dict, dict, dict, dict: Все необходимые статистики
+        """
         salary = {}
         salary_of_name = {}
         city = {}
@@ -87,12 +138,33 @@ class DataSet:
 
     @staticmethod
     def print_statistic(dynamics1, dynamics2, dynamics3, dynamics4, dynamics5, dynamics6):
+        """Вывод всех динамик с описанием
+
+        Args:
+            dynamics1 (dict): Динамика уровня зарплат по годам
+            dynamics2 (dict): Динамика количества вакансий по годам
+            dynamics3 (dict): Динамика уровня зарплат по годам для выбранной профессии
+            dynamics4 (dict): Динамика количества вакансий по годам для выбранной профессии
+            dynamics5 (dict): Уровень зарплат по городам (в порядке убывания)
+            dynamics6 (dict): Доля вакансий по городам (в порядке убывания)
+        Prints:
+            Печатает каждую динамику с описанием
+        """
         list_print2 = [dynamics1, dynamics2, dynamics3, dynamics4, dynamics5, dynamics6]
         for i in range(len(list_print1)):
             print(list_print1[i]+'{0}'.format(list_print2[i]))
 
+
 class InputConnect:
+    """Класс для получения объектов DataSet и Report.
+
+    Attributes:
+        filename (str): Название файла с данными о вакансиях
+        name_vacancy (str): Название выбранной профессии
+    """
     def __init__(self):
+        """Инициализирует объект InputConnect.
+        """
         self.filename, self.name_vacancy = input('Введите название файла: '), input('Введите название профессии: ')
 
         dataset = DataSet(self.filename, self.name_vacancy)
@@ -104,13 +176,38 @@ class InputConnect:
 
 
 class Report:
+    """Класс для получения отчета по полученным динамикам.
+
+    Attributes:
+        workbook (Workbook()): Рабочая книга для получания xlsx-файла
+        name_vacancy (str): Название выбранной профессии
+        dynamics1 (dict): Динамика уровня зарплат по годам
+        dynamics2 (dict): Динамика количества вакансий по годам
+        dynamics3 (dict): Динамика уровня зарплат по годам для выбранной профессии
+        dynamics4 (dict): Динамика количества вакансий по годам для выбранной профессии
+        dynamics5 (dict): Уровень зарплат по городам (в порядке убывания)
+        dynamics6 (dict): Доля вакансий по городам (в порядке убывания)
+    """
     def __init__(self, name_vacancy, dynamics1, dynamics2, dynamics3, dynamics4, dynamics5, dynamics6):
+        """Инициализирует объект Report и получает объект Workbook.
+
+        Args:
+            name_vacancy (str): Название выбранной профессии
+            dynamics1 (dict): Динамика уровня зарплат по годам
+            dynamics2 (dict): Динамика количества вакансий по годам
+            dynamics3 (dict): Динамика уровня зарплат по годам для выбранной профессии
+            dynamics4 (dict): Динамика количества вакансий по годам для выбранной профессии
+            dynamics5 (dict): Уровень зарплат по городам (в порядке убывания)
+            dynamics6 (dict): Доля вакансий по городам (в порядке убывания)
+        """
         self.workbook = Workbook()
         self.name_vacancy = name_vacancy
         self.dynamics1, self.dynamics2, self.dynamics3, self.dynamics4, self.dynamics5, self.dynamics6 \
             = dynamics1, dynamics2, dynamics3, dynamics4, dynamics5, dynamics6
 
     def generate_excel(self):
+        """Генерирует две страницы в рабочей книге с статистикой по годам и статистикой по городам, после чего сохраняет рабочую книгу в файл report.xlsx
+        """
         work_sheet1 = self.workbook.active
         work_sheet1.title = 'Статистика по годам'
         work_sheet1.append(['Год', 'Средняя зарплата', 'Средняя зарплата - ' + self.name_vacancy, 'Количество вакансий', 'Количество вакансий - ' + self.name_vacancy])
