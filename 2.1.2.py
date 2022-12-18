@@ -6,26 +6,58 @@ import numpy as np
 
 name_list = ["name", "salary_from", "salary_to", "salary_currency", "area_name", "published_at"]
 
-list_print1 = ['Динамика уровня зарплат по годам: ','Динамика количества вакансий по годам: ',
-                      'Динамика уровня зарплат по годам для выбранной профессии: ','Динамика количества вакансий по годам для выбранной профессии: ',
-                      'Уровень зарплат по городам (в порядке убывания): ','Доля вакансий по городам (в порядке убывания): ']
+list_print1 = ['Динамика уровня зарплат по годам: ', 'Динамика количества вакансий по годам: ',
+                      'Динамика уровня зарплат по годам для выбранной профессии: ', 'Динамика количества вакансий по годам для выбранной профессии: ',
+                      'Уровень зарплат по городам (в порядке убывания): ', 'Доля вакансий по городам (в порядке убывания): ']
 
 currency_to_rub = {"KZT": 0.13, "RUR": 1,"AZN": 35.68, "GEL": 21.74, "UZS": 0.0055,
                        "KGS": 0.76,"UAH": 1.64,"BYR": 23.91, "EUR": 59.90, "USD": 60.66}
 
+
 class Vacancy:
-    def __init__(self, vacancies):
-        self.name = vacancies[name_list[0]]
-        self.salary_average = math.floor((float(vacancies[name_list[1]]) + float(vacancies[name_list[2]])) / 2) \
-                              * currency_to_rub[vacancies[name_list[3]]]
-        self.area_name = vacancies[name_list[4]]
-        self.publication_year = int(vacancies[name_list[5]][:4])
+    """Класс для получения данных о вакансии.
+
+    Attributes:
+        name (str): Название вакансии
+        salary_average (int): Средняя зарплата в рублях
+        area_name (str): Название города
+        publication_year (int): Год публикации вакансии
+    """
+    def __init__(self, vacancy):
+        """Инициализирует объект Vacancy, вычисляет среднюю зарплату и переводит в рубли
+
+        Args:
+            vacancy (dict): Вакансия
+        """
+        self.name = vacancy[name_list[0]]
+        self.salary_average = math.floor((float(vacancy[name_list[1]]) + float(vacancy[name_list[2]])) / 2) \
+                              * currency_to_rub[vacancy[name_list[3]]]
+        self.area_name = vacancy[name_list[4]]
+        self.publication_year = int(vacancy[name_list[5]][:4])
+
 
 class DataSet:
+    """Класс для получения и печати статистик.
+
+    Attributes:
+        filename (str): Название файла с данными о вакансиях
+        name_vacancy (str): Название выбранной профессии
+    """
     def __init__(self, filename, name):
+        """Инициализирует объект DataSet.
+
+        Args:
+            filename (str): Название файла с данными о вакансиях
+            name (str): Название выбранной профессии
+        """
         self.filename, self.name_vacancy = filename, name
 
     def csv_reader(self):
+        """Считывает данные из входного файла, получает все необходимые статистики для дальнейшей работы и печатает их
+
+        Returns:
+            dict, dict, dict, dict, dict, dict: Все необходимые статистики
+        """
         with open(self.filename, mode='r', encoding='utf-8-sig') as file:
             count = 0
             salary = {}
@@ -101,8 +133,17 @@ class DataSet:
             print(list_print1[i] + list_print2[i])
         return dynamics1, vacancy_number, dynamics2, number_of_name, dict(dynamics3[:10]), dict(dynamics4.copy()[:10])
 
+
 class InputConnect:
+    """Класс для получения объектов DataSet и Report.
+
+    Attributes:
+        filename (str): Название файла с данными о вакансиях
+        name (str): Название выбранной профессии
+    """
     def __init__(self):
+        """Инициализирует объект InputConnect.
+        """
         self.filename, self.name = input('Введите название файла: '), input('Введите название профессии: ')
 
         dataset = DataSet(self.filename, self.name)
@@ -110,13 +151,38 @@ class InputConnect:
         report = Report(self.name, dynamics1, dynamics2, dynamics3, dynamics4, dynamics5, dynamics6)
         report.generate_image()
 
+
 class Report:
+    """Класс для получения отчета по полученным динамикам.
+
+    Attributes:
+        name_vacancy (str): Название выбранной профессии
+        dynamics1 (dict): Динамика уровня зарплат по годам
+        dynamics2 (dict): Динамика количества вакансий по годам
+        dynamics3 (dict): Динамика уровня зарплат по годам для выбранной профессии
+        dynamics4 (dict): Динамика количества вакансий по годам для выбранной профессии
+        dynamics5 (dict): Уровень зарплат по городам (в порядке убывания)
+        dynamics6 (dict): Доля вакансий по городам (в порядке убывания)
+    """
     def __init__(self, name_vacancy, dynamics1, dynamics2, dynamics3, dynamics4, dynamics5, dynamics6):
+        """Инициализирует объект Report.
+
+        Args:
+            name_vacancy (str): Название выбранной профессии
+            dynamics1 (dict): Динамика уровня зарплат по годам
+            dynamics2 (dict): Динамика количества вакансий по годам
+            dynamics3 (dict): Динамика уровня зарплат по годам для выбранной профессии
+            dynamics4 (dict): Динамика количества вакансий по годам для выбранной профессии
+            dynamics5 (dict): Уровень зарплат по городам (в порядке убывания)
+            dynamics6 (dict): Доля вакансий по городам (в порядке убывания)
+        """
         self.name_vacancy = name_vacancy
         self.dynamics1, self.dynamics2, self.dynamics3, self.dynamics4, self.dynamics5, self.dynamics6 \
             = dynamics1, dynamics2, dynamics3, dynamics4, dynamics5, dynamics6
 
     def generate_image(self):
+        """Генерирует 4 диаграммы в на одной старнице на основе статистик, после чего сохраняет картинку в файл graph.png
+        """
         x = np.arange(len(self.dynamics1.keys()))
         width = 0.35
 
@@ -137,7 +203,6 @@ class Report:
         axs[0,1].legend(fontsize=8)
         fig.tight_layout()
 
-
         areas = []
         for area in self.dynamics5.keys():
             areas.append(str(area).replace(' ','\n').replace('-','-\n'))
@@ -155,7 +220,8 @@ class Report:
         axs[1,1].pie(val, labels=k, startangle=150)
         axs[1,1].set_title('Доля вакансий по городам')
         plt.tight_layout()
-        plt.show()
+        plt.savefig('graph.png', dpi=300)
+
 
 if __name__ == '__main__':
     InputConnect()

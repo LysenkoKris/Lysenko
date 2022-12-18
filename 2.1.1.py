@@ -95,7 +95,7 @@ class DataSet:
             dict[k] = с
 
     def get_dynamics(self):
-        """Получение всех необходимых статистик для дальнейшей работы
+        """Получает все необходимые статистики для дальнейшей работы
 
         Returns:
             dict, dict, dict, dict, dict, dict: Все необходимые статистики
@@ -138,7 +138,7 @@ class DataSet:
 
     @staticmethod
     def print_statistic(dynamics1, dynamics2, dynamics3, dynamics4, dynamics5, dynamics6):
-        """Вывод всех динамик с описанием
+        """Выводит все динамики с описанием
 
         Args:
             dynamics1 (dict): Динамика уровня зарплат по годам
@@ -148,7 +148,7 @@ class DataSet:
             dynamics5 (dict): Уровень зарплат по городам (в порядке убывания)
             dynamics6 (dict): Доля вакансий по городам (в порядке убывания)
         Prints:
-            Печатает каждую динамику с описанием
+            Печатать каждой динамики с описанием
         """
         list_print2 = [dynamics1, dynamics2, dynamics3, dynamics4, dynamics5, dynamics6]
         for i in range(len(list_print1)):

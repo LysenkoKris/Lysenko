@@ -19,19 +19,50 @@ list_print1 = ['Динамика уровня зарплат по годам: ',
 
 
 class Vacancy:
-    def __init__(self, vacancies):
-        self.name = vacancies[name_list[0]]
-        self.salary_average = math.floor((float(vacancies[name_list[1]]) + float(vacancies[name_list[2]])) / 2) \
-                              * currency_to_rub[vacancies[name_list[3]]]
-        self.area_name = vacancies[name_list[4]]
-        self.publication_year = int(vacancies[name_list[5]][:4])
+    """Класс для получения данных о вакансии.
+
+    Attributes:
+        name (str): Название вакансии
+        salary_average (int): Средняя зарплата в рублях
+        area_name (str): Название города
+        publication_year (int): Год публикации вакансии
+    """
+
+    def __init__(self, vacancy):
+        """Инициализирует объект Vacancy, вычисляет среднюю зарплату и переводит в рубли
+
+        Args:
+            vacancy (dict): Вакансия
+        """
+        self.name = vacancy[name_list[0]]
+        self.salary_average = math.floor((float(vacancy[name_list[1]]) + float(vacancy[name_list[2]])) / 2) \
+                              * currency_to_rub[vacancy[name_list[3]]]
+        self.area_name = vacancy[name_list[4]]
+        self.publication_year = int(vacancy[name_list[5]][:4])
 
 
 class DataSet:
+    """Класс для получения и печати статистик.
+
+    Attributes:
+        filename (str): Название файла с данными о вакансиях
+        name_vacancy (str): Название выбранной профессии
+    """
     def __init__(self, filename, name):
+        """Инициализирует объект DataSet.
+
+        Args:
+            filename (str): Название файла с данными о вакансиях
+            name (str): Название выбранной профессии
+        """
         self.filename, self.name_vacancy = filename, name
 
     def csv_reader(self):
+        """Считывает данные из входного файла, получает все необходимые статистики для дальнейшей работы и печатает их
+
+        Returns:
+            dict, dict, dict, dict, dict, dict: Все необходимые статистики
+        """
         with open(self.filename, mode='r', encoding='utf-8-sig') as file:
             count = 0
             salary = {}
@@ -112,13 +143,20 @@ class DataSet:
 
 
 class InputConnect:
-    def __init__(self):
-        self.filename = input('Введите название файла: ')
-        self.name_vacancy = input('Введите название профессии: ')
+    """Класс для получения объектов DataSet и Report.
 
-        dataset = DataSet(self.filename, self.name_vacancy)
+    Attributes:
+        filename (str): Название файла с данными о вакансиях
+        name (str): Название выбранной профессии
+    """
+    def __init__(self):
+        """Инициализирует объект InputConnect.
+        """
+        self.filename, self.name = input('Введите название файла: '), input('Введите название профессии: ')
+
+        dataset = DataSet(self.filename, self.name)
         dynamics1, dynamics2, dynamics3, dynamics4, dynamics5, dynamics6 = dataset.csv_reader()
-        new_graphic = Report(self.name_vacancy, dynamics1, dynamics2, dynamics3, dynamics4, dynamics5, dynamics6)
+        new_graphic = Report(self.name, dynamics1, dynamics2, dynamics3, dynamics4, dynamics5, dynamics6)
         new_graphic.generate_image()
         work_sheet1 = new_graphic.get_first_sheet()
         work_sheet2, len_new_data = new_graphic.get_second_sheet()
@@ -127,7 +165,30 @@ class InputConnect:
 
 
 class Report:
+    """Класс для получения отчета по полученным динамикам.
+
+    Attributes:
+        workbook (Workbook()): Рабочая книга для получания xlsx-файла
+        name_vacancy (str): Название выбранной профессии
+        dynamics1 (dict): Динамика уровня зарплат по годам
+        dynamics2 (dict): Динамика количества вакансий по годам
+        dynamics3 (dict): Динамика уровня зарплат по годам для выбранной профессии
+        dynamics4 (dict): Динамика количества вакансий по годам для выбранной профессии
+        dynamics5 (dict): Уровень зарплат по городам (в порядке убывания)
+        dynamics6 (dict): Доля вакансий по городам (в порядке убывания)
+    """
     def __init__(self, name_vacancy, dynamics1, dynamics2, dynamics3, dynamics4, dynamics5, dynamics6):
+        """Инициализирует объект Report и получает объект Workbook.
+
+        Args:
+            name_vacancy (str): Название выбранной профессии
+            dynamics1 (dict): Динамика уровня зарплат по годам
+            dynamics2 (dict): Динамика количества вакансий по годам
+            dynamics3 (dict): Динамика уровня зарплат по годам для выбранной профессии
+            dynamics4 (dict): Динамика количества вакансий по годам для выбранной профессии
+            dynamics5 (dict): Уровень зарплат по городам (в порядке убывания)
+            dynamics6 (dict): Доля вакансий по городам (в порядке убывания)
+        """
         self.workbook = Workbook()
         self.name_vacancy = name_vacancy
         self.dynamics1 = dynamics1
@@ -138,6 +199,8 @@ class Report:
         self.dynamics6 = dynamics6
 
     def generate_image(self):
+        """Генерирует 4 диаграммы в на одной старнице на основе статистик, после чего сохраняет картинку в файл graph.png
+        """
         x = np.arange(len(self.dynamics1.keys()))
         width = 0.35
 
@@ -180,6 +243,11 @@ class Report:
         plt.savefig('graph.png', dpi=300)
 
     def get_first_sheet(self):
+        """Генерирует первую страницу рабочей книги с статистикой по годам.
+
+        Returns:
+            Worksheet: Первая страница рабочей книги
+        """
         work_sheet1 = self.workbook.active
         work_sheet1.title = 'Статистика по годам'
         work_sheet1.append(['Год', 'Средняя зарплата', 'Средняя зарплата - ' + self.name_vacancy, 'Количество вакансий',
@@ -203,6 +271,12 @@ class Report:
         return work_sheet1
 
     def get_second_sheet(self):
+        """Генерирует вторую страницу рабочей книги с статистикой по городам.
+
+        Returns:
+            Worksheet: Вторая страница рабочей книги
+            int: Количество строк
+        """
         new_data = [['Город', 'Уровень зарплат', '', 'Город', 'Доля вакансий']]
 
         for (city1, value1), (city2, value2) in zip(self.dynamics5.items(), self.dynamics6.items()):
@@ -227,6 +301,12 @@ class Report:
         return work_sheet2, len(new_data)
 
     def generate_excel(self, work_sheet1, work_sheet2, len_new_data):
+        """Сохраняет рабочую книгу в файл report.xlsx
+        Args:
+            work_sheet1 (Worksheet): Первая страница рабочей книги
+            work_sheet2 (Worksheet): Вторая страница рабочей книги
+            len_new_data (int): Количество строк
+        """
         bold = Font(bold=True)
         for c in 'ABCDE':
             work_sheet1[c + '1'].font = bold
@@ -249,6 +329,8 @@ class Report:
         self.workbook.save('report.xlsx')
 
     def generate_pdf(self):
+        """Генирирует и сохраняет файл report.pdf, в котором хранятся report.xlsx и graph.png
+        """
         env = Environment(loader=FileSystemLoader('.'))
         template = env.get_template("pdf_template.html")
         dynamics = []
