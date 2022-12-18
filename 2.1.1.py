@@ -112,7 +112,7 @@ class Report:
 
     def generate_excel(self):
         work_sheet1 = self.workbook.active
-        work_sheet1.title = 'Статистика'
+        work_sheet1.title = 'Не статистика по годам'
         work_sheet1.append(['Год', 'Средняя зарплата', 'Средняя зарплата - ' + self.name_vacancy, 'Количество вакансий', 'Количество вакансий - ' + self.name_vacancy])
         for year in self.dynamics1.keys():
             work_sheet1.append([year, self.dynamics1[year], self.dynamics3[year], self.dynamics2[year], self.dynamics4[year]])
