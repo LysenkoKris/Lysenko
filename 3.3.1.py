@@ -47,7 +47,7 @@ def get_years_currency(file_name):
             if year == int(range_date[1][0]) and month == int(range_date[1][1]) or month == 12:
                 break
 
-    result.to_csv("data\\currency.csv", index=False)
+    result.to_csv("currency.csv", index=False)
 
 
 get_years_currency('data\\vacancies_dif_currencies.csv')
