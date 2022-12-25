@@ -1,5 +1,4 @@
 # created by virtualenv automatically
 /.idea
 /venv
-/data/vacancies.csv
-/data/csv_by_years
+/data
