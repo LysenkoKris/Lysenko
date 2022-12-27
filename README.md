@@ -23,6 +23,9 @@
 ![Снимок экрана 25-12-2022](https://i.ibb.co/0XLrMhq/3-3-1.png)
 Полученный dataframe в csv-формате представлен файлом currency.csv в репозитории
 
+## Разделен файл vacancies_dif_currencies.csv по годам
+![Снимок экрана 27-12-2022](https://i.ibb.co/8YRkR4J/image-2022-12-27-17-55-02.png)
+
 ### Task 3.3.2
 
 Полученный dataframe в csv-формате представлен файлом 100_vacancies.csv в репозитории
